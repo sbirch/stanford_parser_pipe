@@ -51,6 +51,8 @@ T (tree?)
 	.children = [list of T or plaintext word]
 ```
 
+Example:
+
 ```
 >>> import stanford_parser_pipe
 

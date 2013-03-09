@@ -2,12 +2,20 @@ import subprocess, os, sys, threading, Queue
 from collections import namedtuple
 import output_parser
 
-handle = subprocess.Popen('java -mx150m -cp stanford-parser.jar: edu.stanford.nlp.parser.lexparser.LexicalizedParser -sentences newline -outputFormat wordsAndTags,penn,typedDependencies englishPCFG.ser -',
+includes_dir = os.path.dirname(os.path.abspath(__file__))
+
+parser_path = os.path.join(includes_dir,'stanford-parser.jar')
+model_path = os.path.join(includes_dir, 'englishPCFG.ser')
+
+command = 'java -mx150m -cp "%s": edu.stanford.nlp.parser.lexparser.LexicalizedParser -sentences newline -outputFormat wordsAndTags,penn,typedDependencies "%s" -' % (parser_path, model_path)
+
+handle = subprocess.Popen(command,
 	bufsize=1,
 	stdin=subprocess.PIPE,
 	stdout=subprocess.PIPE,
 	stderr=subprocess.PIPE,
-	shell=True)
+	shell=True
+)
 
 #for returning results the chunk-reader sees between threads
 results = Queue.Queue()
@@ -27,20 +35,31 @@ def chunk_reader(handle):
 		else:
 			buffered += line
 
-def echo(handle):
-	while True:
-		line = handle.readline()
-		sys.stdout.write(line)
-
-#prevent buffers from being filled
+#prevent OS buffers from being filled
+#and save errors in case something dies
+runlog = []
 def ignore(handle):
 	while True:
 		line = handle.readline()
+		if len(runlog) > 1000:
+			runlog.pop(0)
+		runlog.append(line)
 
 t = threading.Thread(target=chunk_reader, args=(handle.stdout,))
 t.daemon = True
 t.start()
 t = threading.Thread(target=ignore, args=(handle.stderr,))
+t.daemon = True
+t.start()
+
+def checker(h):
+	h.wait()
+	print 'The parser subprocess has quit!'
+	print 'Return code:', h.returncode
+	print 'stderr:'
+	print ''.join(runlog)
+
+t = threading.Thread(target=checker, args=(handle,))
 t.daemon = True
 t.start()
 
