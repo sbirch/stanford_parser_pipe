@@ -51,7 +51,7 @@ T (tree?)
 	.children = [list of T or plaintext word]
 ```
 
-Example:
+Example usage:
 
 ```
 >>> import stanford_parser_pipe
@@ -81,9 +81,9 @@ Parse(
 
 ## Useful documents
 
-[What are dependencies?](http://nlp.stanford.edu/software/stanford-dependencies.shtml)
-[Dependencies manual](http://nlp.stanford.edu/software/dependencies_manual.pdf)
-[Penn treebank tags](http://bulba.sdsu.edu/jeanette/thesis/PennTags.html)
+- [What are dependencies?](http://nlp.stanford.edu/software/stanford-dependencies.shtml)
+- [Dependencies manual](http://nlp.stanford.edu/software/dependencies_manual.pdf)
+- [Penn treebank tags](http://bulba.sdsu.edu/jeanette/thesis/PennTags.html)
 
 ## Contact
 
@@ -91,5 +91,5 @@ Parse(
 
 ## TODO
 
-- Slashes are escaped into \\/
+- Slashes are escaped into `\\/`
 - Words in parse tree should be word references (DFS traversal of parse tree should yield word order?)
